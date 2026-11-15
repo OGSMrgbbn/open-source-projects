@@ -22,7 +22,27 @@ npm start
 
 Den eigenen Token ausschließlich lokal als `DISCORD_TOKEN=...` in `.env` eintragen. Das Tool liest keine Zugangsdaten aus Browsern. Token niemals im Chat posten. Das Konto muss Mitglied beider Server sein. Für die Übertragung ist ein eigener Zielserver am einfachsten. Ansonsten benötigt das Konto dort die im Fehlertext genannten Channel-, Nachrichten-, Anhangs- und Thread-Rechte einschließlich `MANAGE_CHANNELS` und `MANAGE_ROLES`.
 
-Das Menü bietet Serverliste, Export, Import-Vorschau und Übertragung. IDs zeigt die Serverliste an; alternativ in Discord den Entwicklermodus einschalten und die Server-ID kopieren.
+Die Terminal-Oberfläche bietet Serverauswahl, Export, Archivübersicht, Import-Vorschau und Übertragung. Mit **Pfeiltasten** navigieren und **Enter** bestätigen. **Esc / 0** geht zurück. Zahlen wählen eine Zeile, Enter öffnet sie. Server werden direkt aus einer Liste gewählt; IDs müssen im Menü nicht abgetippt werden. Nach jedem Vorgang kehrst du ins Hauptmenü zurück. Unter „Token ändern“ kannst du den Zugang mit verdeckter Eingabe aktualisieren.
+
+Mindestens 36 × 16 Terminalzeichen verwenden. Die Oberfläche passt sich beim Vergrößern an. Auch Windows CMD und Windows Terminal werden über SSH unterstützt. Bestehende Befehle ohne Menü bleiben verfügbar.
+
+## Vom Windows-PC öffnen
+
+Wenn der Windows-Starter eingerichtet wurde, genügt in einem **neuen CMD-Fenster**:
+
+```cmd
+dct
+```
+
+Der Befehl verbindet sich per SSH mit deinem Pi und öffnet dessen dauerhafte `channel-transfer`-Sitzung. Das Linux-Passwort des Pi-Benutzers wird abgefragt, sofern du keine SSH-Schlüsselanmeldung eingerichtet hast. Das Passwort wird beim Tippen nicht angezeigt. PC und Pi müssen über das gleiche Netz oder einen bereits vorhandenen VPN-Zugang erreichbar sein.
+
+Für andere Installationen den Installer in PowerShell ausführen. Platzhalter ersetzen; den öffentlichen Hostschlüssel **auf dem Pi** aus `/etc/ssh/ssh_host_ed25519_key.pub` ablesen und nur Typ plus Schlüssel (ohne Kommentar) übergeben:
+
+```powershell
+.\scripts\install-windows.ps1 -PiHost 'DEIN-PI.local' -PiUser 'DEIN_BENUTZER' -HostKey 'ssh-ed25519 DEIN_VERIFIZIERTER_HOSTSCHLUESSEL'
+```
+
+Der Installer legt `%LOCALAPPDATA%\Programs\DiscordTransfer\dct.cmd` an und ergänzt nur den Benutzer-PATH. Er speichert weder Linux-Passwörter noch Discord-Tokens auf Windows. Der Pi benötigt dafür den Startbefehl `~/.local/bin/channel-transfer` und einen aktiven SSH-Dienst. Ein bereits offenes CMD-Fenster erbt die PATH-Änderung nicht; ein neues über das Windows-Startmenü öffnen.
 
 Für lange Übertragungen in einer bestehenden `tmux`-Sitzung arbeiten, damit eine SSH-Unterbrechung den Prozess nicht beendet. Es ist ein einmaliger Transferjob, kein ständig laufender Dienst.
 
@@ -66,7 +86,7 @@ npm start -- import --target ZIELSERVER_ID --archive data/backup
 npm start -- import --target ZIELSERVER_ID --archive data/backup --apply
 ```
 
-Der Import ohne `--apply` ist eine Vorschau. Im interaktiven Menü wird vor dem echten Import die Ziel-ID abgefragt. Bestehende Channels werden nicht gelöscht oder als Importziel benutzt. Neue Channels bleiben zunächst privat für das angemeldete Konto und Zielserver-Administratoren. Nach dem Prüfen die gewünschten Rollenfreigaben in Discord setzen.
+Der Import ohne `--apply` ist eine Vorschau. Im interaktiven Menü werden Zielserver und Umfang angezeigt; erst „Jetzt übertragen“ startet den Import. Bestehende Channels werden nicht gelöscht oder als Importziel benutzt. Neue Channels bleiben zunächst privat für das angemeldete Konto und Zielserver-Administratoren. Nach dem Prüfen die gewünschten Rollenfreigaben in Discord setzen.
 
 Exportoptionen:
 

@@ -1,5 +1,11 @@
 # Änderungen
 
+## 1.2.0 — 2026-11-15
+
+- Neue Terminal-Oberfläche mit Pfeiltasten, Serverauswahl, Archivübersicht, Fortschrittsansicht und verdeckter Token-Eingabe.
+- Rückkehr zum Hauptmenü nach jedem Vorgang; bestehende CLI-Befehle bleiben erhalten.
+- Windows-Installer für den kurzen CMD-Befehl `dct`, Verbindung über SSH mit verifiziertem Hostschlüssel.
+
 ## 1.1.1 — 2026-11-15
 
 - systemd-Arbeitsverzeichnis ohne unzulässige Anführungszeichen erzeugen; auf Raspberry Pi/Debian 13 festgestellt.
