@@ -13,7 +13,11 @@ export function unitQuote(value) {
 }
 
 export function createUnits(projectDir, nodePath, npmPath, searchPath) {
-  const service = `[Unit]\nDescription=Channel Transfer Git update\nAfter=network-online.target\n\n[Service]\nType=oneshot\nWorkingDirectory=${unitQuote(projectDir)}\nEnvironment=${unitQuote(`PATH=${searchPath}`)}\nExecStart=${unitQuote(nodePath)} ${unitQuote(npmPath)} run update\nTimeoutStartSec=20min\nUMask=0077\n`;
+  // Unlike ExecStart/Environment, WorkingDirectory is one path, not a word list.
+  // Quotes here become part of the path and systemd rejects it as non-absolute.
+  if (!projectDir.startsWith('/') || /[\r\n\0]/.test(projectDir)) throw new Error('Ungültiges systemd-Arbeitsverzeichnis.');
+  const workingDirectory = projectDir.replaceAll('%', '%%');
+  const service = `[Unit]\nDescription=Channel Transfer Git update\nAfter=network-online.target\n\n[Service]\nType=oneshot\nWorkingDirectory=${workingDirectory}\nEnvironment=${unitQuote(`PATH=${searchPath}`)}\nExecStart=${unitQuote(nodePath)} ${unitQuote(npmPath)} run update\nTimeoutStartSec=20min\nUMask=0077\n`;
   const timer = '[Unit]\nDescription=Check Channel Transfer updates every 15 minutes\n\n[Timer]\nOnCalendar=*:0/15\nRandomizedDelaySec=30\nPersistent=true\n\n[Install]\nWantedBy=timers.target\n';
   return { service, timer };
 }

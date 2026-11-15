@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { git, updateProject, hasPendingUpdate, withRuntimeLock, assertNoPrivateFiles } from '../src/updater.js';
 import { createUnits, unitQuote } from '../scripts/install-updates.js';
 
@@ -104,10 +106,26 @@ test('Repository-Sperre verhindert Update während laufender Sitzung', async t =
 
 test('systemd-Units behandeln Leerzeichen und Prozentzeichen in Pfaden korrekt', () => {
   const units = createUnits('/home/a/Some Project', '/opt/node/bin/node', '/opt/node/npm-cli.js', '/a%b:/usr/bin');
-  assert.ok(units.service.includes('WorkingDirectory="/home/a/Some Project"'));
+  assert.ok(units.service.includes('WorkingDirectory=/home/a/Some Project\n'));
   assert.ok(units.service.includes('PATH=/a%%b:/usr/bin'));
   assert.ok(units.timer.includes('OnCalendar=*:0/15'));
   assert.throws(() => unitQuote('bad\npath'));
   assert.doesNotThrow(() => assertNoPrivateFiles('projects/tool/.env.example\nREADME.md'));
   assert.throws(() => assertNoPrivateFiles('projects/tool/.env.local'));
+});
+
+test('Linux systemd akzeptiert die erzeugte Service-Datei', { skip: process.platform !== 'linux' }, async t => {
+  const execute = promisify(execFile);
+  try { await execute('systemd-analyze', ['--version']); }
+  catch (error) { if (error.code === 'ENOENT') { t.skip('systemd-analyze nicht installiert'); return; } throw error; }
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'transfer-unit-test-'));
+  t.after(async () => {
+    if (!path.resolve(directory).startsWith(path.resolve(os.tmpdir()) + path.sep + 'transfer-unit-test-')) throw new Error('Unsicherer Testpfad');
+    await rm(directory, { recursive: true, force: true });
+  });
+  const projectDirectory = path.join(directory, 'Some Project');
+  await mkdir(projectDirectory);
+  const servicePath = path.join(directory, 'channel-transfer-validation.service');
+  await writeFile(servicePath, createUnits(projectDirectory, process.execPath, '/usr/share/nodejs/npm/bin/npm-cli.js', '/usr/bin:/bin').service);
+  await execute('systemd-analyze', ['verify', '--man=no', servicePath]);
 });

@@ -1,5 +1,10 @@
 # Änderungen
 
+## 1.1.1 — 2026-11-15
+
+- systemd-Arbeitsverzeichnis ohne unzulässige Anführungszeichen erzeugen; auf Raspberry Pi/Debian 13 festgestellt.
+- Linux-Test validiert die erzeugte Service-Datei mit `systemd-analyze verify`.
+
 ## 1.1.0 — 2026-11-15
 
 - Projekt in ein öffentliches Sammel-Repository unter `projects/discord-channel-transfer` eingeordnet.
