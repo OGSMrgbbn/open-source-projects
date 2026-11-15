@@ -43,6 +43,24 @@ test('Installierte Discord-Bibliothek erzeugt PLAYING und CUSTOM im selben Gatew
   assert.equal(packets[0].d.activities[1].state, 'mrgbbn.Studio | Im Studio');
 });
 
+test('Spielbild und Anwendungs-ID bleiben bei Textwechseln im Gateway-Paket erhalten', t => {
+  const client = new Client(); t.after(() => client.destroy());
+  client.user = { id: '123456789012345678' }; client.presence.userId = client.user.id;
+  const config = presenceConfig({ PRESENCE_APPLICATION_ID: '111111111111111111', PRESENCE_IMAGE_ID: '222222222222222222' });
+  const packets = []; client.ws.broadcast = packet => packets.push(packet);
+  for (let index = 0; index < 3; index++) client.presence.set(buildPresence(config, index));
+  for (const packet of packets) {
+    const game = packet.d.activities[0];
+    assert.equal(game.application_id, config.applicationId);
+    assert.equal(game.assets.large_image, config.imageId);
+    assert.equal(game.assets.large_text, 'mrgbbn.Studio');
+    assert.equal(packet.d.status, 'online');
+  }
+  assert.throws(() => presenceConfig({ PRESENCE_APPLICATION_ID: '111111111111111111' }));
+  assert.throws(() => presenceConfig({ PRESENCE_IMAGE_ID: '222222222222222222' }));
+  assert.throws(() => presenceConfig({ PRESENCE_APPLICATION_ID: 'invalid', PRESENCE_IMAGE_ID: '222222222222222222' }));
+});
+
 test('Hintergrunddienst startet ohne Terminal und enthält keine Zugangsdaten', () => {
   const unit = createPresenceUnit('/home/test/My Project%name', '/opt/Node Path/node');
   assert.ok(unit.includes('WorkingDirectory=/home/test/My Project%%name\n'));

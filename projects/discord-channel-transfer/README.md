@@ -178,6 +178,8 @@ systemctl --user disable --now channel-transfer-presence.service
 
 Andere gleichzeitig angemeldete Discord-Clients können die sichtbare Präsenz beeinflussen. Der Dienst sendet den eingestellten Status bei jedem Textwechsel erneut. Er ist unabhängig vom Terminal-Menü; dessen Verbindungsanzeige bezieht sich nur auf die Menü-Sitzung.
 
+Für ein Spielbild ein eigenes Logo in der eigenen Discord-Anwendung unter **Rich Presence → Kunst-Assets** hochladen. Die Anwendungs-ID als `PRESENCE_APPLICATION_ID` und die numerische Asset-ID als `PRESENCE_IMAGE_ID` in der lokalen `.env` setzen. Beide Werte müssen gemeinsam gesetzt werden. Das Bild bleibt bei jedem Textwechsel erhalten. Logos gehören nicht automatisch zur Open-Source-Lizenz dieses Tools und müssen nicht im Code-Repository veröffentlicht werden.
+
 ## Lizenz
 
 GNU GPL v3.0: [Lizenz](LICENSE), [Drittanbieterhinweise](NOTICE.md), [Changelog](CHANGELOG.md). Beiträge sind willkommen; siehe [Mitwirkungsanleitung](../../CONTRIBUTING.md).

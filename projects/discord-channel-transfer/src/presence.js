@@ -7,14 +7,25 @@ export function presenceConfig(env = process.env) {
   }
   const seconds = Number(env.PRESENCE_INTERVAL_SECONDS ?? 60);
   if (!Number.isInteger(seconds) || seconds < 30 || seconds > 86400) throw new Error('PRESENCE_INTERVAL_SECONDS muss zwischen 30 und 86400 liegen.');
-  return { texts: texts.map(text => text.trim()), intervalMs: seconds * 1000 };
+  const applicationId = env.PRESENCE_APPLICATION_ID?.trim() || null;
+  const imageId = env.PRESENCE_IMAGE_ID?.trim() || null;
+  if (Boolean(applicationId) !== Boolean(imageId) || [applicationId, imageId].some(id => id !== null && !/^\d{17,20}$/.test(id))) {
+    throw new Error('Für das Spielbild PRESENCE_APPLICATION_ID und PRESENCE_IMAGE_ID gemeinsam als Discord-IDs setzen.');
+  }
+  return { texts: texts.map(text => text.trim()), intervalMs: seconds * 1000, applicationId, imageId };
 }
 
 export function buildPresence(config, index = 0) {
   return {
     status: 'online', afk: false, since: 0,
     activities: [
-      { name: 'mrgbbn.Studio', type: 'PLAYING' },
+      {
+        name: 'mrgbbn.Studio', type: 'PLAYING',
+        ...(config.applicationId && config.imageId ? {
+          application_id: config.applicationId,
+          assets: { large_image: config.imageId, large_text: 'mrgbbn.Studio' },
+        } : {}),
+      },
       { name: 'Custom Status', type: 'CUSTOM', state: config.texts[index % config.texts.length] },
     ],
   };
@@ -25,7 +36,7 @@ export function startPresence(client, config, { every = setInterval, cancel = cl
   const apply = () => {
     if (!client.isReady()) return;
     client.user.setPresence(buildPresence(config, index));
-    log(`Online · Spiel: mrgbbn.Studio · Text ${index + 1}/${config.texts.length} gesetzt`);
+    log(`Online · Spiel: mrgbbn.Studio · Text ${index + 1}/${config.texts.length} gesetzt${config.imageId ? ' · Logo aktiv' : ''}`);
   };
   const tick = () => { if (client.isReady()) { index = (index + 1) % config.texts.length; apply(); } };
   client.on('ready', apply);
