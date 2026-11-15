@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+data/
+*.log
+dist/
+.repo-runtime.lock
+.update-pending.json
+.update-pending.json.*.tmp
