@@ -15,6 +15,16 @@ export function fit(value, width) {
   return text + ' '.repeat(Math.max(0, width - used));
 }
 
+function wrap(value, width) {
+  const lines = []; let line = '', used = 0;
+  for (const { segment } of segmenter.segment(clean(value))) {
+    const size = glyphWidth(segment);
+    if (used + size > width && line) { lines.push(line); line = ''; used = 0; }
+    line += segment; used += size;
+  }
+  lines.push(line); return lines;
+}
+
 export function renderScreen(model, { columns = 80, rows = 24, color = true } = {}) {
   const width = Math.max(1, Math.min(100, columns - 2));
   const height = Math.max(1, Math.min(30, rows - 1));
@@ -36,7 +46,7 @@ export function renderScreen(model, { columns = 80, rows = 24, color = true } = 
       lines.push(actual === selected && color ? `${C.selected}${C.accent}${C.bold}${content}${C.reset}` : style(content));
     });
   } else {
-    for (const text of (model.lines ?? []).slice(-available)) lines.push(line(text));
+    for (const text of (model.lines ?? []).flatMap(text => wrap(text, width)).slice(-available)) lines.push(line(text));
   }
   while (lines.length < height - footerRows) lines.push(line());
   lines.push(line('─'.repeat(width), 'muted'));

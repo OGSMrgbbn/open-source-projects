@@ -66,6 +66,8 @@ test('Renderer passt in breite und schmale Terminals; Servernamen können keine 
   }
   assert.equal(clean('\x1b[2Jbad\r\nname'), 'bad  name');
   assert.equal(fit('界界', 3), '界 ');
+  const errorScreen = renderScreen({ lines: ['Ein langer Dateipfad: ' + 'x'.repeat(120) + '/manifest.json'] }, { columns: 60, rows: 24, color: false });
+  assert.ok(errorScreen.includes('/manifest.json'));
 });
 
 test('Archivliste zeigt fertige und fortsetzbare Archive und ignoriert fremde Ordner', async t => {
