@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { hasPendingUpdate, repositoryRoot, updateProject, withRuntimeLock } from './updater.js';
+import { refreshPresenceService } from './presence-service.js';
 
 const projectDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -16,7 +17,10 @@ async function run() {
     const disabled = process.env.AUTO_UPDATE === 'false';
     if (disabled && await hasPendingUpdate(projectDir)) throw new Error('Ein Update ist unvollständig. Mit AUTO_UPDATE=true und npm run update reparieren.');
     if (disabled) log('Automatische Updates sind deaktiviert.');
-    else await updateProject(projectDir, { log });
+    else {
+      const update = await updateProject(projectDir, { log });
+      if (update.status === 'updated') await refreshPresenceService(log);
+    }
     if (updateOnly) return { status: 'finished' };
     const child = spawn(process.execPath, ['--env-file-if-exists=.env', path.join(projectDir, 'src', 'cli.js'), ...args], {
       cwd: projectDir, env: process.env, stdio: 'inherit', windowsHide: true,

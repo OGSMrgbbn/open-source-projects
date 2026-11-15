@@ -13,12 +13,14 @@ $knownHosts = Join-Path $installDir 'known_hosts'
 [IO.File]::WriteAllText($knownHosts, "$PiHost $HostKey`n", [Text.UTF8Encoding]::new($false))
 $launcher = @"
 @echo off
+setlocal
+set "TERM=xterm-256color"
 title MRGBBN Discord Transfer
-ssh.exe -o "UserKnownHostsFile=%~dp0known_hosts" -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 -o ConnectTimeout=10 -t $PiUser@$PiHost "/home/$PiUser/.local/bin/channel-transfer"
+ssh.exe -o "UserKnownHostsFile=%~dp0known_hosts" -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 -o ConnectTimeout=10 -t $PiUser@$PiHost "env TERM=xterm-256color /home/$PiUser/.local/bin/channel-transfer"
 if errorlevel 1 (
   echo.
-  echo Verbindung fehlgeschlagen. Pi und PC muessen sich im gleichen Netz befinden.
-  echo Verwende das Linux-Passwort des Pi-Benutzers $PiUser.
+  echo SSH-Verbindung oder Programm beendet. Beachte die Fehlermeldung oben.
+  echo Bei Passwortabfrage: Linux-Passwort fuer $PiUser eingeben und Enter druecken.
   pause
 )
 "@

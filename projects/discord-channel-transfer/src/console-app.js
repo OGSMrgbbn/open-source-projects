@@ -5,6 +5,7 @@ import { TerminalUI } from './terminal.js';
 import { readJson, lockDirectory } from './storage.js';
 import { exportGuild, validateManifest } from './archive.js';
 import { importGuild, transferPlan } from './transfer.js';
+import { buildPresence, presenceConfig } from './presence.js';
 
 const errorText = error => {
   let text = String(error.message ?? error);
@@ -38,7 +39,9 @@ export async function runConsole() {
     if (!process.env.DISCORD_TOKEN?.trim()) throw new Error('Discord-Token fehlt. Im Hauptmenü „Token ändern“ öffnen.');
     client?.destroy();
     const { Client, Options } = await import('discord.js-selfbot-v13');
-    client = new Client({ captchaRetryLimit: 0, retryLimit: 0, restRequestTimeout: 30000, allowedMentions: { parse: [], repliedUser: false }, makeCache: Options.cacheWithLimits({ MessageManager: 0, PresenceManager: 0 }) });
+    const initialPresence = buildPresence(presenceConfig());
+    client = new Client({ presence: { status: 'online', afk: false, activities: [] }, captchaRetryLimit: 0, retryLimit: 0, restRequestTimeout: 30000, allowedMentions: { parse: [], repliedUser: false }, makeCache: Options.cacheWithLimits({ MessageManager: 0, PresenceManager: 0 }) });
+    client.once('ready', () => client.user.setPresence(initialPresence));
     client.on('error', () => {});
     let timeout;
     try {

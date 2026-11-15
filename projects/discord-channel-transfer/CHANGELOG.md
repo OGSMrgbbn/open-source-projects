@@ -1,5 +1,11 @@
 # Änderungen
 
+## 1.3.0 — 2026-11-15
+
+- Unabhängiger systemd-Statusdienst: Online, dauerhaft „Spielt mrgbbn.Studio“, wechselnder Textstatus.
+- Autostart, Wiederverbindung, kontrollierter Neustart nach Updates und lokalen Token-/Statusänderungen.
+- Windows-Starter setzt den Terminaltyp explizit, damit tmux auch aus CMD startet.
+
 ## 1.2.0 — 2026-11-15
 
 - Neue Terminal-Oberfläche mit Pfeiltasten, Serverauswahl, Archivübersicht, Fortschrittsansicht und verdeckter Token-Eingabe.

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { exportGuild, validateManifest } from './archive.js';
 import { importGuild } from './transfer.js';
 import { readJson, lockDirectory, snowflake } from './storage.js';
+import { buildPresence, presenceConfig } from './presence.js';
 
 const cyan = text => process.stdout.isTTY ? `\x1b[36m${text}\x1b[0m` : text;
 const log = text => console.log(`${cyan(new Date().toLocaleTimeString('de-DE'))}  ${text}`);
@@ -64,10 +65,13 @@ async function main() {
     if (!process.env.DISCORD_TOKEN?.trim()) throw new Error('DISCORD_TOKEN fehlt. .env.example nach .env kopieren und lokal ausfüllen.');
     const { Client, Options } = await import('discord.js-selfbot-v13');
     client = new Client({
+      presence: { status: 'online', afk: false, activities: [] },
       captchaRetryLimit: 0, retryLimit: 0, restRequestTimeout: 30_000,
       allowedMentions: { parse: [], repliedUser: false },
       makeCache: Options.cacheWithLimits({ MessageManager: 0, PresenceManager: 0 }),
     });
+    const initialPresence = buildPresence(presenceConfig());
+    client.once('ready', () => client.user.setPresence(initialPresence));
     client.on('error', () => log('Discord-Verbindungsfehler. Der aktuelle Schritt kann fehlschlagen.'));
     client.on('rateLimit', info => log(`Discord-Limit: warte ${Math.ceil((info.timeout ?? 1000) / 1000)} Sekunden.`));
     let timer;

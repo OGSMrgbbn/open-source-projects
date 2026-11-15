@@ -149,6 +149,35 @@ Die automatisierten Tests prüfen Export, Chronologie, Sichtbarkeit, privaten Im
 
 Zusätzliche Git-Integrationstests verwenden echte lokale Repositories und prüfen Updates, unveränderte lokale Daten, Konfliktschutz, Offline-Verhalten und Reparatur nach fehlgeschlagener Installation. Der systemd-Timer muss auf dem Pi eingerichtet werden; er wurde nicht auf dieser Windows-Entwicklungsmaschine aktiviert.
 
-## Open Source
+## Dauerhaft online auf dem Raspberry Pi
+
+Der separate Statusdienst bleibt auch bei geschlossenem CMD, abgemeldeter SSH-Sitzung oder beendetem Transfer-Menü aktiv. Er setzt Online, das Spiel **mrgbbn.Studio** und wechselt den Textstatus standardmäßig alle 60 Sekunden. Dafür müssen der Pi und seine Internetverbindung eingeschaltet bleiben.
+
+Im Projektordner auf dem Pi einmal ausführen:
+
+```bash
+npm run presence:enable
+loginctl enable-linger "$USER"
+```
+
+In `.env` lassen sich die Texte und das Intervall einstellen (mindestens 30 Sekunden):
+
+```dotenv
+PRESENCE_INTERVAL_SECONDS=60
+PRESENCE_TEXTS='["mrgbbn.Studio","mrgbbn.Studio | Open Source","mrgbbn.Studio | Coding & Community"]'
+```
+
+Der Dienst erkennt Änderungen an Token oder Statuskonfiguration alle 30 Sekunden und startet kontrolliert neu. Bei Verbindungsproblemen übernimmt zunächst die Discord-Bibliothek die Wiederverbindung; nach längerem Ausfall startet systemd den Dienst neu. Erfolgreiche Git-Updates starten einen aktivierten Statusdienst ebenfalls neu. Die Statusverbindung blockiert den Update-Timer nicht; eine offene Transfer-Sitzung blockiert Updates weiterhin zum Schutz laufender Vorgänge.
+
+```bash
+systemctl --user status channel-transfer-presence.service
+journalctl --user -u channel-transfer-presence.service -n 15 --no-pager
+# Dauerstatus vollständig deaktivieren:
+systemctl --user disable --now channel-transfer-presence.service
+```
+
+Andere gleichzeitig angemeldete Discord-Clients können die sichtbare Präsenz beeinflussen. Der Dienst sendet den eingestellten Status bei jedem Textwechsel erneut. Er ist unabhängig vom Terminal-Menü; dessen Verbindungsanzeige bezieht sich nur auf die Menü-Sitzung.
+
+## Lizenz
 
 GNU GPL v3.0: [Lizenz](LICENSE), [Drittanbieterhinweise](NOTICE.md), [Changelog](CHANGELOG.md). Beiträge sind willkommen; siehe [Mitwirkungsanleitung](../../CONTRIBUTING.md).
