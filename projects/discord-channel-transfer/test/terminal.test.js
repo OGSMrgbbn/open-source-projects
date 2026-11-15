@@ -57,9 +57,10 @@ test('Stopp während eines Jobs setzt Abbruchsignal, ohne den Job hart zu beende
 
 test('Renderer passt in breite und schmale Terminals; Servernamen können keine ANSI-Sequenzen einschleusen', () => {
   const model = { title: 'Quellserver', items: Array.from({ length: 30 }, (_, i) => ({ label: `Server ${i}`, description: 'Beschreibung' })), selected: 29 };
-  for (const [columns, rows] of [[100, 30], [60, 20], [36, 16], [25, 10]]) {
+  for (const [columns, rows] of [[100, 30], [60, 20], [36, 16], [25, 10], [200, 90]]) {
     const screen = renderScreen(model, { columns, rows, color: false });
     assert.ok(screen.split('\r\n').length <= rows - 1);
+    assert.ok(screen.split('\r\n').length <= 30);
     assert.ok(screen.split('\r\n').every(line => line.length < columns));
     if (columns >= 36) assert.ok(screen.includes('Server 29'));
   }

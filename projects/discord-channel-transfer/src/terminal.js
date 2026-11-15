@@ -17,7 +17,7 @@ export function fit(value, width) {
 
 export function renderScreen(model, { columns = 80, rows = 24, color = true } = {}) {
   const width = Math.max(1, Math.min(100, columns - 2));
-  const height = Math.max(1, rows - 1);
+  const height = Math.max(1, Math.min(30, rows - 1));
   const style = (text, kind = 'white') => color ? `${C.bg}${C[kind]}${text}${C.reset}` : text;
   const line = (text = '', kind) => style(` ${fit(text, width)}`, kind);
   if (columns < 36 || rows < 16) return [line('Fenster bitte vergrößern', 'accent'), line('Mindestens 36 × 16 Zeichen'), line('Q / Esc: zurück')].slice(0, height).join('\r\n');
