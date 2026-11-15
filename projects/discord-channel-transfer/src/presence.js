@@ -1,4 +1,4 @@
-export const DEFAULT_STATUSES = ['mrgbbn.Studio', 'mrgbbn.Studio | Open Source', 'mrgbbn.Studio | Coding & Community'];
+export const DEFAULT_STATUSES = ['mrgbbn.Studio', 'mrgbbn.Studio | Im Studio', 'mrgbbn.Studio | Kreativ am Werk'];
 
 export function presenceConfig(env = process.env) {
   const texts = env.PRESENCE_TEXTS ? JSON.parse(env.PRESENCE_TEXTS) : DEFAULT_STATUSES;

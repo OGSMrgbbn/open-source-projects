@@ -164,7 +164,7 @@ In `.env` lassen sich die Texte und das Intervall einstellen (mindestens 30 Seku
 
 ```dotenv
 PRESENCE_INTERVAL_SECONDS=60
-PRESENCE_TEXTS='["mrgbbn.Studio","mrgbbn.Studio | Open Source","mrgbbn.Studio | Coding & Community"]'
+PRESENCE_TEXTS='["mrgbbn.Studio","mrgbbn.Studio | Im Studio","mrgbbn.Studio | Kreativ am Werk"]'
 ```
 
 Der Dienst erkennt Änderungen an Token oder Statuskonfiguration alle 30 Sekunden und startet kontrolliert neu. Bei Verbindungsproblemen übernimmt zunächst die Discord-Bibliothek die Wiederverbindung; nach längerem Ausfall startet systemd den Dienst neu. Erfolgreiche Git-Updates starten einen aktivierten Statusdienst ebenfalls neu. Die Statusverbindung blockiert den Update-Timer nicht; eine offene Transfer-Sitzung blockiert Updates weiterhin zum Schutz laufender Vorgänge.

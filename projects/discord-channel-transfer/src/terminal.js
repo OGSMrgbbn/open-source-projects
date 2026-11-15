@@ -31,7 +31,7 @@ export function renderScreen(model, { columns = 80, rows = 24, color = true } = 
   const style = (text, kind = 'white') => color ? `${C.bg}${C[kind]}${text}${C.reset}` : text;
   const line = (text = '', kind) => style(` ${fit(text, width)}`, kind);
   if (columns < 36 || rows < 16) return [line('Fenster bitte vergrößern', 'accent'), line('Mindestens 36 × 16 Zeichen'), line('Q / Esc: zurück')].slice(0, height).join('\r\n');
-  const lines = [line('MRGBBN  /  OPEN SOURCE', 'muted'), line('DISCORD TRANSFER', 'accent'), line(model.status ?? 'Bereit', 'muted'), line('─'.repeat(width), 'muted'), line(model.title ?? 'Kommandozentrale'), line(model.description ?? '', 'muted'), line()];
+  const lines = [line('MRGBBN  /  STUDIO', 'muted'), line('DISCORD TRANSFER', 'accent'), line(model.status ?? 'Bereit', 'muted'), line('─'.repeat(width), 'muted'), line(model.title ?? 'Kommandozentrale'), line(model.description ?? '', 'muted'), line()];
   const footerRows = 4;
   const available = Math.max(1, height - lines.length - footerRows);
   if (model.items?.length) {

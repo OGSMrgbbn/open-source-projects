@@ -40,7 +40,7 @@ test('Installierte Discord-Bibliothek erzeugt PLAYING und CUSTOM im selben Gatew
   assert.equal(packets[0].d.activities[0].type, 0);
   assert.equal(packets[0].d.activities[0].name, 'mrgbbn.Studio');
   assert.equal(packets[0].d.activities[1].type, 4);
-  assert.equal(packets[0].d.activities[1].state, 'mrgbbn.Studio | Open Source');
+  assert.equal(packets[0].d.activities[1].state, 'mrgbbn.Studio | Im Studio');
 });
 
 test('Hintergrunddienst startet ohne Terminal und enthält keine Zugangsdaten', () => {
