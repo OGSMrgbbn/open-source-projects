@@ -171,7 +171,7 @@ Der Dienst erkennt Änderungen an Token oder Statuskonfiguration alle 30 Sekunde
 
 ```bash
 systemctl --user status channel-transfer-presence.service
-journalctl --user -u channel-transfer-presence.service -n 15 --no-pager
+tail -n 15 data/presence.log
 # Dauerstatus vollständig deaktivieren:
 systemctl --user disable --now channel-transfer-presence.service
 ```

@@ -9,7 +9,8 @@ const exec = promisify(execFile);
 
 export function createPresenceUnit(projectDir, nodePath) {
   if (!projectDir.startsWith('/') || /[\r\n\0]/.test(projectDir)) throw new Error('Ungültiges Arbeitsverzeichnis.');
-  return `[Unit]\nDescription=Discord Transfer permanent presence\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\nWorkingDirectory=${projectDir.replaceAll('%', '%%')}\nExecStart=${unitQuote(nodePath)} --env-file=.env ${unitQuote(path.posix.join(projectDir, 'src/presence-daemon.js'))}\nRestart=always\nRestartSec=30\nTimeoutStopSec=10\nUMask=0077\nNoNewPrivileges=true\n\n[Install]\nWantedBy=default.target\n`;
+  const logPath = path.posix.join(projectDir, 'data/presence.log').replaceAll('%', '%%');
+  return `[Unit]\nDescription=Discord Transfer permanent presence\nStartLimitIntervalSec=0\n\n[Service]\nType=simple\nWorkingDirectory=${projectDir.replaceAll('%', '%%')}\nExecStart=${unitQuote(nodePath)} --env-file=.env ${unitQuote(path.posix.join(projectDir, 'src/presence-daemon.js'))}\nRestart=always\nRestartSec=30\nTimeoutStopSec=10\nUMask=0077\nNoNewPrivileges=true\nStandardOutput=append:${logPath}\nStandardError=append:${logPath}\n\n[Install]\nWantedBy=default.target\n`;
 }
 
 async function main() {
@@ -17,6 +18,7 @@ async function main() {
   const projectDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const unitDir = path.join(process.env.XDG_CONFIG_HOME ?? path.join(os.homedir(), '.config'), 'systemd/user');
   await mkdir(unitDir, { recursive: true });
+  await mkdir(path.join(projectDir, 'data'), { recursive: true, mode: 0o700 });
   await writeFile(path.join(unitDir, 'channel-transfer-presence.service'), createPresenceUnit(projectDir, process.execPath), { mode: 0o600 });
   await exec('systemctl', ['--user', 'daemon-reload']);
   await exec('systemctl', ['--user', 'enable', 'channel-transfer-presence.service']);
